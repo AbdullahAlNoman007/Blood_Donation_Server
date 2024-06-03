@@ -6,9 +6,21 @@ import { validationSchema } from './user.validation'
 
 const router = express.Router()
 
-router.post('/register', validateRequest(validationSchema.userValidationSchema), userController.createUser)
-router.get('/my-profile', auth(), userController.getProfile)
-router.put('/my-profile', auth(), validateRequest(validationSchema.userUpdateSchema), userController.updateProfile)
+router.post(
+    '/create-admin ',
+    validateRequest(validationSchema.adminValidationSchema),
+    userController.createAdmin
+)
+router.post(
+    '/create-donor ',
+    validateRequest(validationSchema.donorValidationSchema),
+    userController.createDonor
+)
+router.post(
+    '/create-requester ',
+    validateRequest(validationSchema.requesterValidationSchema),
+    userController.createRequester
+)
 
 
 export const userRouter = router

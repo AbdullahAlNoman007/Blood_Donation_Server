@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { bloodGroups } from "./user.const";
 
-const userValidationSchema = z.object({
+const donorValidationSchema = z.object({
     body: z.object({
         name: z.string(),
         email: z.string().email(),
@@ -9,19 +9,37 @@ const userValidationSchema = z.object({
         bloodType: z.enum(bloodGroups),
         location: z.string(),
         age: z.number().int().positive(),
-        bio: z.string(),
         lastDonationDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        availability: z.boolean(),
+        phone: z.string(),
+        socialMedia: z.string().optional()
     })
-})
-const userUpdateSchema = z.object({
+});
+
+const requesterValidationSchema = z.object({
     body: z.object({
-        bio: z.string().optional(),
-        age: z.number().optional(),
-        lastDonationDate: z.string().optional()
+        name: z.string(),
+        email: z.string().email(),
+        password: z.string().min(6),
+        bloodType: z.enum(bloodGroups),
+        location: z.string(),
+        phone: z.string(),
+        socialMedia: z.string().optional()
     })
-})
+});
+
+const adminValidationSchema = z.object({
+    body: z.object({
+        email: z.string().email(),
+        password: z.string().min(6),
+        name: z.string(),
+        phone: z.string(),
+        socialMedia: z.string().optional()
+    })
+});
 
 export const validationSchema = {
-    userValidationSchema,
-    userUpdateSchema
+    adminValidationSchema,
+    donorValidationSchema,
+    requesterValidationSchema
 }

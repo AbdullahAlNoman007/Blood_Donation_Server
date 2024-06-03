@@ -4,38 +4,37 @@ import catchAsync from "../../utility/trycatch";
 import { userService } from "./user.service";
 
 
-const createUser = catchAsync(async (req, res) => {
+const createAdmin = catchAsync(async (req, res) => {
 
-
-    const result = await userService.createUserIntoDB(req.body)
+    const result = await userService.createAdminIntoDB(req.body)
 
     sendRespone(res, {
         statusCode: httpStatus.CREATED,
         success: true,
-        message: "User registered successfully",
+        message: "Admin registered successfully",
         data: result
     })
 })
-const getProfile = catchAsync(async (req, res) => {
 
+const createDonor = catchAsync(async (req, res) => {
 
-    const result = await userService.getProfile(req.user)
+    const result = await userService.createDonorIntoDB(req.body)
 
     sendRespone(res, {
-        statusCode: httpStatus.OK,
+        statusCode: httpStatus.CREATED,
         success: true,
-        message: "Profile retrieved successfully",
+        message: "Donor registered successfully",
         data: result
     })
 })
-const updateProfile = catchAsync(async (req, res) => {
+const createRequester = catchAsync(async (req, res) => {
 
-    const result = await userService.updateProfile(req.user, req.body)
+    const result = await userService.createRequesterIntoDB(req.body)
 
     sendRespone(res, {
-        statusCode: httpStatus.OK,
+        statusCode: httpStatus.CREATED,
         success: true,
-        message: "User profile updated successfully",
+        message: "Requester registered successfully",
         data: result
     })
 })
@@ -43,7 +42,7 @@ const updateProfile = catchAsync(async (req, res) => {
 
 
 export const userController = {
-    createUser,
-    getProfile,
-    updateProfile
+    createAdmin,
+    createDonor,
+    createRequester
 }
