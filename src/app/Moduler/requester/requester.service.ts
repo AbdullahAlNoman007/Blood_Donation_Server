@@ -1,23 +1,21 @@
-import { Prisma, requestStatus } from "@prisma/client"
-import { TdecodedData, Tpagination } from "../../interface"
+import { Prisma } from "@prisma/client"
+import { Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
-import { TdonationRequest, TgetDonor } from "./donor.interface"
-import { donorSearchFields } from "./donor.const"
 import calculatePagination from "../../utility/pagination"
-import AppError from "../../Error/AppError"
-import httpStatus from "http-status"
+import { requesterSearchFields } from "./requester.const"
+import { TgetRequester } from "./requester.interface"
 
 
-const getDonor = async (params: TgetDonor, options: Tpagination) => {
+const getRequester = async (params: TgetRequester, options: Tpagination) => {
 
     const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options)
-    const { searchTerm, availability, ...rest } = params
-    let andCondition: Prisma.DonorWhereInput[] = []
+    const { searchTerm, ...rest } = params
+    let andCondition: Prisma.RequesterWhereInput[] = []
 
 
     if (searchTerm) {
         andCondition.push({
-            OR: donorSearchFields.map((item) => ({
+            OR: requesterSearchFields.map((item) => ({
                 [item]: {
                     contains: searchTerm,
                     mode: 'insensitive'
@@ -35,19 +33,12 @@ const getDonor = async (params: TgetDonor, options: Tpagination) => {
             }))
         })
     }
-    if (availability) {
-        andCondition.push({
-            availability: {
-                equals: availability.toLowerCase() === 'true' ? true : false
-            }
-        })
-    }
 
-    const whereCondition: Prisma.DonorWhereInput = { AND: andCondition }
+    const whereCondition: Prisma.RequesterWhereInput = { AND: andCondition }
 
     console.dir(whereCondition, { depth: 'infinity' });
 
-    const data = await prisma.donor.findMany({
+    const data = await prisma.requester.findMany({
         where: whereCondition,
         skip,
         take: limit,
@@ -56,7 +47,7 @@ const getDonor = async (params: TgetDonor, options: Tpagination) => {
         }
     })
 
-    const total = await prisma.donor.count({ where: whereCondition });
+    const total = await prisma.requester.count({ where: whereCondition });
 
     const meta = {
         total,
@@ -172,6 +163,6 @@ const getDonor = async (params: TgetDonor, options: Tpagination) => {
 
 // }
 
-export const donorService = {
-    getDonor
+export const requesterService = {
+    getRequester
 }
