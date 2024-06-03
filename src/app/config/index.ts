@@ -8,5 +8,8 @@ export default {
     jwt: {
         jwt_access_token: process.env.JWT_ACCESS_TOKEN,
         jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN
+    },
+    const: {
+        social: process.env.SOCIAL
     }
 }

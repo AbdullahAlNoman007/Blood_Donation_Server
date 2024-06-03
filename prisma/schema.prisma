@@ -12,7 +12,7 @@ model User {
   id                 String              @id @default(uuid())
   email              String              @unique
   password           String
-  role               useRole
+  role               userRole
   status             accountStatus       @default(ACTIVE)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -38,35 +38,36 @@ model Admin {
 }
 
 model Donor {
-  id           String        @id @default(uuid())
-  userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id])
-  name         String
-  email        String        @unique
-  status       accountStatus @default(ACTIVE)
-  bloodType    BloodType
-  location     String
-  availability Boolean       @default(false)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  Request      Request[]
+  id               String        @id @default(uuid())
+  userId           String        @unique
+  user             User          @relation(fields: [userId], references: [id])
+  name             String
+  age              Int
+  email            String        @unique
+  status           accountStatus @default(ACTIVE)
+  bloodType        BloodType
+  location         String
+  availability     Boolean       @default(false)
+  lastDonationDate String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  Request          Request[]
 
   @@map("donor")
 }
 
 model Requester {
-  id            String        @id @default(uuid())
-  userId        String        @unique
-  user          User          @relation(fields: [userId], references: [id])
-  name          String
-  email         String        @unique
-  contactNumber String        @unique
-  status        accountStatus @default(ACTIVE)
-  bloodType     BloodType
-  location      String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  Request       Request[]
+  id        String        @id @default(uuid())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id])
+  name      String
+  email     String        @unique
+  status    accountStatus @default(ACTIVE)
+  bloodType BloodType
+  location  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  Request   Request[]
 
   @@map("requester")
 }
@@ -143,7 +144,7 @@ enum accountStatus {
   BLOCKED
 }
 
-enum useRole {
+enum userRole {
   Admin
   Donor
   Requester
