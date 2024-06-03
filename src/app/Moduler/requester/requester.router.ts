@@ -5,6 +5,6 @@ import { requesterController } from './requester.controller';
 
 const router = express.Router()
 
-router.get('/donor-list', requesterController.getRequester)
+router.get('/requester-list', requesterController.getRequester)
 
-export const donorRouter = router
+export const requesterRouter = router

@@ -2,6 +2,7 @@ import express from 'express'
 import { userRouter } from '../Moduler/User/user.router';
 import { authRouter } from '../Moduler/auth/auth.router';
 import { donorRouter } from '../Moduler/donor/donor.router';
+import { requesterRouter } from '../Moduler/requester/requester.router';
 
 const router = express.Router()
 
@@ -17,6 +18,10 @@ const moduleRouters = [
     {
         path: '/donor',
         route: donorRouter
+    },
+    {
+        path: '/requester',
+        route: requesterRouter
     }
 ]
 

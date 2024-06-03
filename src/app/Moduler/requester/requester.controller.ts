@@ -15,7 +15,7 @@ const getRequester = catchAsync(async (req, res) => {
     sendRespone(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "Donors successfully found",
+        message: "Requester successfully found",
         meta: result.meta,
         data: result.data
     })
