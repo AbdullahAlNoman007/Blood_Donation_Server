@@ -7,17 +7,17 @@ import { validationSchema } from './user.validation'
 const router = express.Router()
 
 router.post(
-    '/create-admin ',
+    '/create-admin',
     validateRequest(validationSchema.adminValidationSchema),
     userController.createAdmin
 )
 router.post(
-    '/create-donor ',
+    '/create-donor',
     validateRequest(validationSchema.donorValidationSchema),
     userController.createDonor
 )
 router.post(
-    '/create-requester ',
+    '/create-requester',
     validateRequest(validationSchema.requesterValidationSchema),
     userController.createRequester
 )

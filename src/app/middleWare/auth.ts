@@ -6,27 +6,29 @@ import prisma from "../utility/prismaClient";
 import { TdecodedData } from "../interface";
 
 
-const auth = () => {
+const auth = (...roles: string[]) => {
 
     return catchAsync(async (req, res, next) => {
-        let decoded;
         const token = req.headers.authorization
-
         if (!token) {
             throw new AppError(httpStatus.UNAUTHORIZED, "Please Put the Access Token")
         }
-        try {
-            decoded = jwtDecode(token) as TdecodedData
-        } catch (error) {
-            console.log(error);
-            next(error)
-        }
+        const decoded = jwtDecode(token) as TdecodedData
         await prisma.user.findUniqueOrThrow({
             where: {
-                email: (decoded as TdecodedData).email
+                email: decoded.email,
+                status: 'ACTIVE'
             }
         })
-        req.user = decoded as TdecodedData;
+        if (roles.length <= 0) {
+            throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized")
+        }
+
+        if (!roles.includes(decoded.role)) {
+            throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized")
+        }
+        req.user = decoded;
+
 
         next()
     })

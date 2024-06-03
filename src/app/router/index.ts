@@ -11,11 +11,11 @@ const moduleRouters = [
         route: userRouter
     },
     {
-        path: '/',
+        path: '/auth',
         route: authRouter
     },
     {
-        path: '/',
+        path: '/donor',
         route: donorRouter
     }
 ]

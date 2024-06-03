@@ -1,6 +1,6 @@
 import config from "../../config"
 import prisma from "../../utility/prismaClient"
-import { adminPayload, donorPayload, requesterPayload, userUpdateData } from "./user.interface"
+import { adminPayload, donorPayload, requesterPayload } from "./user.interface"
 import bcrypt from 'bcrypt'
 import { userRole } from "@prisma/client"
 
@@ -132,7 +132,6 @@ const createRequesterIntoDB = async (payload: requesterPayload) => {
 
     return result
 }
-
 
 
 export const userService = {

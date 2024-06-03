@@ -1,6 +1,8 @@
+import { BloodType } from "@prisma/client";
+
 export interface TgetDonor {
     searchTerm?: string;
-    bloodType?: string;
+    bloodType?: BloodType;
     availability?: string;
 }
 
