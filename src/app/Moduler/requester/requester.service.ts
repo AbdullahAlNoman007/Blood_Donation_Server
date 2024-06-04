@@ -59,110 +59,41 @@ const getRequester = async (params: TgetRequester, options: Tpagination) => {
 
 }
 
-// const createDonorRequest = async (decoded: TdecodedData, payload: TdonationRequest) => {
+const deleteRequester = async (id: string) => {
 
-//     await prisma.user.findUniqueOrThrow({
-//         where: {
-//             id: payload.donorId
-//         }
-//     })
+    const result = await prisma.$transaction(async (tx) => {
+        await tx.request.deleteMany({
+            where: {
+                requesterId: id
+            }
+        })
 
-//     const data = {
-//         requesterId: decoded.userId,
-//         ...payload
-//     }
-//     const result = await prisma.request.create({
-//         data: data,
-//         select: {
-//             id: true,
-//             donorId: true,
-//             phoneNumber: true,
-//             dateOfDonation: true,
-//             hospitalName: true,
-//             hospitalAddress: true,
-//             reason: true,
-//             requestStatus: true,
-//             createdAt: true,
-//             updatedAt: true,
-//             donor: {
-//                 select: {
-//                     id: true,
-//                     name: true,
-//                     email: true,
-//                     bloodType: true,
-//                     location: true,
-//                     availability: true,
-//                     createdAt: true,
-//                     updatedAt: true,
+        await tx.contactInformation.delete({
+            where: {
+                userId: id
+            }
+        })
 
-//                     userProfile: true
-//                 }
-//             }
-//         }
-//     })
+        const requester = await tx.requester.delete({
+            where: {
+                userId: id
+            }
+        })
 
-//     return result
+        await tx.user.delete({
+            where: {
+                id: id
+            }
+        })
 
-// }
+        return requester
+    })
 
-// const getDonationRequestion = async (decoded: TdecodedData) => {
-//     const result = await prisma.request.findMany({
-//         where: {
-//             donorId: decoded.userId
-//         },
-//         select: {
-//             id: true,
-//             donorId: true,
-//             requesterId: true,
-//             phoneNumber: true,
-//             dateOfDonation: true,
-//             hospitalName: true,
-//             hospitalAddress: true,
-//             reason: true,
-//             requestStatus: true,
-//             createdAt: true,
-//             updatedAt: true,
-//             requester: {
-//                 select: {
-//                     id: true,
-//                     name: true,
-//                     email: true,
-//                     bloodType: true,
-//                     location: true,
-//                     availability: true
-//                 }
-//             }
-//         }
-//     })
+    return result
+}
 
-//     return result
-
-// }
-
-// const updateDonationRequestion = async (id: string, payload: { status: requestStatus }, decoded: TdecodedData) => {
-
-//     const request = await prisma.request.findUniqueOrThrow({
-//         where: {
-//             id: id
-//         }
-//     })
-//     if (request.donorId !== decoded.userId) {
-//         throw new AppError(httpStatus.BAD_REQUEST, "You can't update another donor's request")
-//     }
-
-//     const result = await prisma.request.update({
-//         where: {
-//             id: id
-//         },
-//         data: {
-//             requestStatus: payload.status
-//         }
-//     })
-
-//     return result
-
-// }
 
 export const requesterService = {
-    getRequester
+    getRequester,
+    deleteRequester
 }

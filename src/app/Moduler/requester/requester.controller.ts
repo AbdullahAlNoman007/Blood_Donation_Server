@@ -21,42 +21,18 @@ const getRequester = catchAsync(async (req, res) => {
     })
 })
 
-// const createDonorRequest = catchAsync(async (req, res) => {
-
-//     const result = await donorService.createDonorRequest(req.user, req.body)
-
-//     sendRespone(res, {
-//         success: true,
-//         statusCode: httpStatus.CREATED,
-//         message: "Request successfully made",
-//         data: result
-//     })
-// })
-// const getDonationRequest = catchAsync(async (req, res) => {
-
-//     const result = await donorService.getDonationRequestion(req.user)
-
-//     sendRespone(res, {
-//         success: true,
-//         statusCode: httpStatus.OK,
-//         message: "Donation requests retrieved successfully",
-//         data: result
-//     })
-// })
-
-// const updateDonationRequest = catchAsync(async (req, res) => {
-
-//     const { requestId } = req.params
-//     const result = await donorService.updateDonationRequestion(requestId, req.body, req.user)
-
-//     sendRespone(res, {
-//         success: true,
-//         statusCode: httpStatus.OK,
-//         message: "Donation request status successfully updated",
-//         data: result
-//     })
-// })
+const deleteRequester = catchAsync(async (req, res) => {
+    const { id } = req.params
+    const result = await requesterService.deleteRequester(id)
+    sendRespone(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Requester is deleted successfully",
+        data: result
+    })
+})
 
 export const requesterController = {
-    getRequester
+    getRequester,
+    deleteRequester
 }
