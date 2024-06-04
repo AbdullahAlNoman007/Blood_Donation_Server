@@ -32,7 +32,19 @@ const deleteDonor = catchAsync(async (req, res) => {
     })
 })
 
+const changeStatus = catchAsync(async (req, res) => {
+    const { id } = req.params
+    const result = await donorService.changeStatus(id, req.body)
+    sendRespone(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Donor's Status is changed successfully",
+        data: result
+    })
+})
+
 export const donorController = {
     getDonor,
-    deleteDonor
+    deleteDonor,
+    changeStatus
 }

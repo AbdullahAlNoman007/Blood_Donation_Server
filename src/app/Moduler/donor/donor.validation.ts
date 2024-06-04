@@ -1,4 +1,4 @@
-import { requestStatus } from "@prisma/client";
+import { accountStatus, requestStatus } from "@prisma/client";
 import { z } from "zod";
 
 export const donationSchema = z.object({
@@ -9,6 +9,12 @@ export const donationSchema = z.object({
         hospitalName: z.string(),
         hospitalAddress: z.string(),
         reason: z.string(),
+    })
+})
+
+export const changeStatusValidationSchema = z.object({
+    body: z.object({
+        status: z.enum([accountStatus.ACTIVE, accountStatus.BLOCKED])
     })
 })
 

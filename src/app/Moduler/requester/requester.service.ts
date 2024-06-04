@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Prisma, accountStatus } from "@prisma/client"
 import { Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
 import calculatePagination from "../../utility/pagination"
@@ -92,8 +92,35 @@ const deleteRequester = async (id: string) => {
     return result
 }
 
+const changeStatus = async (id: string, payload: { status: accountStatus }) => {
+    const result = await prisma.$transaction(async (tx) => {
+        await tx.user.update({
+            where: {
+                id: id
+            },
+            data: {
+                status: payload.status
+            }
+        })
+
+        const donor = await tx.donor.update({
+            where: {
+                id: id
+            },
+            data: {
+                status: payload.status
+            }
+        })
+
+        return donor
+    })
+
+    return result
+}
+
 
 export const requesterService = {
     getRequester,
-    deleteRequester
+    deleteRequester,
+    changeStatus
 }
