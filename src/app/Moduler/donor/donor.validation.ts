@@ -1,7 +1,8 @@
 import { accountStatus, requestStatus } from "@prisma/client";
 import { z } from "zod";
+import { bloodGroups } from "../User/user.const";
 
-export const donationSchema = z.object({
+const donationSchema = z.object({
     body: z.object({
         donorId: z.string(),
         phoneNumber: z.string().regex(/^\d{11}$/),
@@ -18,8 +19,27 @@ export const changeStatusValidationSchema = z.object({
     })
 })
 
-export const donationUpdateSchema = z.object({
+const donationUpdateSchema = z.object({
     body: z.object({
         status: z.enum([requestStatus.APPROVED, requestStatus.REJECTED])
     })
 })
+
+const donorValidationSchema = z.object({
+    body: z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+        location: z.string().optional(),
+        age: z.number().int().positive().optional(),
+        lastDonationDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        availability: z.boolean().optional(),
+        phone: z.string().optional(),
+        socialMedia: z.string().optional()
+    })
+});
+
+export const donorZodSchema = {
+    donorValidationSchema,
+    donationUpdateSchema,
+    donationSchema
+}

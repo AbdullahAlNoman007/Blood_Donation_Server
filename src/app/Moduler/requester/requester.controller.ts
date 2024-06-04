@@ -43,8 +43,20 @@ const changeStatus = catchAsync(async (req, res) => {
     })
 })
 
+const updateRequester = catchAsync(async (req, res) => {
+    const { id } = req.params
+    const result = await requesterService.updateRequester(id, req.body)
+    sendRespone(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Requester's Data is updated successfully",
+        data: result
+    })
+})
+
 export const requesterController = {
     getRequester,
     deleteRequester,
-    changeStatus
+    changeStatus,
+    updateRequester
 }

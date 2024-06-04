@@ -3,7 +3,13 @@ import { Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
 import calculatePagination from "../../utility/pagination"
 import { requesterSearchFields } from "./requester.const"
-import { TgetRequester } from "./requester.interface"
+import { TgetRequester, requesterUpdatePayload } from "./requester.interface"
+
+type IcontactInformation = {
+    email?: string;
+    phone?: string;
+    socialMedia?: string;
+}
 
 
 const getRequester = async (params: TgetRequester, options: Tpagination) => {
@@ -118,9 +124,52 @@ const changeStatus = async (id: string, payload: { status: accountStatus }) => {
     return result
 }
 
+const updateRequester = async (id: string, payload: requesterUpdatePayload) => {
+    const { email, phone, socialMedia, ...rest } = payload;
+
+    await prisma.$transaction(async (tx) => {
+
+        if (email) {
+            await tx.user.update({
+                where: { id },
+                data: { email }
+            });
+
+            await tx.requester.update({
+                where: { id },
+                data: { email }
+            });
+        }
+
+
+        const contactInfoPayload: IcontactInformation = {};
+        if (email) contactInfoPayload.email = email;
+        if (phone) contactInfoPayload.phone = phone;
+        if (socialMedia) contactInfoPayload.socialMedia = socialMedia;
+
+        if (Object.keys(contactInfoPayload).length > 0) {
+            await tx.contactInformation.update({
+                where: { id },
+                data: contactInfoPayload
+            });
+        }
+
+        if (Object.keys(rest).length > 0) {
+            await tx.requester.update({
+                where: { id },
+                data: rest
+            });
+        }
+    });
+
+    return { message: "Requester's Data is Updated!!!" };
+};
+
+
 
 export const requesterService = {
     getRequester,
     deleteRequester,
-    changeStatus
+    changeStatus,
+    updateRequester
 }

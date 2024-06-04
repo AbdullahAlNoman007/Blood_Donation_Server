@@ -1,12 +1,17 @@
 import { Prisma, accountStatus, requestStatus } from "@prisma/client"
 import { TdecodedData, Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
-import { TdonationRequest, TgetDonor } from "./donor.interface"
+import { TdonationRequest, TgetDonor, donorUpdatePayload } from "./donor.interface"
 import { donorSearchFields } from "./donor.const"
 import calculatePagination from "../../utility/pagination"
 import AppError from "../../Error/AppError"
 import httpStatus from "http-status"
 
+type IcontactInformation = {
+    email?: string;
+    phone?: string;
+    socialMedia?: string;
+}
 
 const getDonor = async (params: TgetDonor, options: Tpagination) => {
 
@@ -127,8 +132,50 @@ const changeStatus = async (id: string, payload: { status: accountStatus }) => {
     return result
 }
 
+const updateDonor = async (id: string, payload: donorUpdatePayload) => {
+    const { email, phone, socialMedia, ...rest } = payload;
+
+    await prisma.$transaction(async (tx) => {
+
+        if (email) {
+            await tx.user.update({
+                where: { id },
+                data: { email }
+            });
+
+            await tx.donor.update({
+                where: { id },
+                data: { email }
+            });
+        }
+
+
+        const contactInfoPayload: IcontactInformation = {};
+        if (email) contactInfoPayload.email = email;
+        if (phone) contactInfoPayload.phone = phone;
+        if (socialMedia) contactInfoPayload.socialMedia = socialMedia;
+
+        if (Object.keys(contactInfoPayload).length > 0) {
+            await tx.contactInformation.update({
+                where: { id },
+                data: contactInfoPayload
+            });
+        }
+
+        if (Object.keys(rest).length > 0) {
+            await tx.donor.update({
+                where: { id },
+                data: rest
+            });
+        }
+    });
+
+    return { message: "Donor's Data is Updated!!!" };
+};
+
 export const donorService = {
     getDonor,
     deleteDonor,
-    changeStatus
+    changeStatus,
+    updateDonor
 }

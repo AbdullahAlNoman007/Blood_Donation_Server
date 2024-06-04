@@ -14,3 +14,14 @@ export interface TdonationRequest {
     hospitalAddress: string;
     reason: string;
 }
+
+export interface donorUpdatePayload {
+    name?: string;
+    email?: string;
+    location?: string;
+    age?: number;
+    lastDonationDate?: string;
+    availability?: boolean;
+    phone?: string;
+    socialMedia?: string;
+}
