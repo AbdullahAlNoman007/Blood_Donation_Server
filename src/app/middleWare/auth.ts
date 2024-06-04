@@ -17,6 +17,7 @@ const auth = (...roles: string[]) => {
         await prisma.user.findUniqueOrThrow({
             where: {
                 email: decoded.email,
+                id: decoded.userId,
                 status: 'ACTIVE'
             }
         })
