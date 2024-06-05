@@ -9,7 +9,7 @@ import httpStatus from "http-status"
 
 
 
-const getDonor = async (params: TgetDonor, options: Tpagination) => {
+const getDonor = async (params: TgetDonor, options: Tpagination, decoded: TdecodedData) => {
 
     const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options)
     const { searchTerm, availability, ...rest } = params
@@ -44,9 +44,22 @@ const getDonor = async (params: TgetDonor, options: Tpagination) => {
         })
     }
 
+    if (decoded?.role === 'Requester') {
+
+        const requester = await prisma.requester.findUniqueOrThrow({
+            where: {
+                userId: decoded.userId
+            }
+        })
+
+        andCondition.push({
+            bloodType: requester.bloodType
+        })
+
+    }
+
     const whereCondition: Prisma.DonorWhereInput = { AND: andCondition }
 
-    console.dir(whereCondition, { depth: 'infinity' });
 
     const data = await prisma.donor.findMany({
         where: whereCondition,

@@ -13,7 +13,6 @@ const loginInDB = async (payload: Tlogin) => {
             email: payload.email
         }
     })
-    console.log(isUserExists);
 
     let userDetails;
 

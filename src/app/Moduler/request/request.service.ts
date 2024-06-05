@@ -19,6 +19,10 @@ const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRe
         }
     })
 
+    if (donor.bloodType !== requester.bloodType) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Your blood type doesn't match with donor's blood type")
+    }
+
     const contactInfo = await prisma.contactInformation.findUniqueOrThrow({
         where: {
             userId: decoded.userId
@@ -31,18 +35,11 @@ const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRe
         ...payload
     }
 
-    console.log({ donor });
-    console.log({ requester });
-    console.log({ data });
+    const result = await prisma.request.create({
+        data: data
+    })
 
-
-
-
-    // const result = await prisma.request.create({
-    //     data: data
-    // })
-
-    // return result
+    return result
 
 }
 

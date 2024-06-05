@@ -10,7 +10,7 @@ const getDonor = catchAsync(async (req, res) => {
     const filter = pick(req.query, donorFilterFields);
     const options = pick(req.query, donorPaginationFields);
 
-    const result = await donorService.getDonor(filter, options);
+    const result = await donorService.getDonor(filter, options, req.user);
 
     sendRespone(res, {
         success: true,
