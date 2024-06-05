@@ -44,93 +44,36 @@ const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRe
 }
 
 const getDonationRequestion = async (decoded: TdecodedData) => {
-    let result;
-    let finalResult: any[] = [];
-    if (decoded.role === 'Donor') {
+    const roleKey = decoded.role === 'Donor' ? 'donorId' : 'requesterId';
+    const includeRelation = decoded.role === 'Donor' ? 'requester' : 'donor';
 
-        result = await prisma.request.findMany({
-            where: {
-                donorId: decoded.userId
+    const result = await prisma.request.findMany({
+        where: {
+            [roleKey]: decoded.userId,
+        },
+        include: {
+            [includeRelation]: {
+                include: {
+                    user: {
+                        include: {
+                            ContactInformation: true,
+                        },
+                    },
+                },
             },
-            include: {
-                requester: {
-                    include: {
-                        user: {
-                            include: {
-                                ContactInformation: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
+        },
+    });
 
-        result.map((item) => {
-            const { requester: { user: { ContactInformation } }, ...rest } = item;
-
-            if (rest.requestStatus === 'APPROVED') {
-                const data = {
-                    ...rest,
-                    contactInformation: ContactInformation
-                }
-                finalResult.push(data)
-            }
-
-            else {
-                const data = {
-                    ...rest
-                }
-                finalResult.push(data)
-            }
-
-        })
-
-
-    }
-    if (decoded.role === 'Requester') {
-        result = await prisma.request.findMany({
-            where: {
-                requesterId: decoded.userId
-            },
-            include: {
-                donor: {
-                    include: {
-                        user: {
-                            include: {
-                                ContactInformation: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
-
-        result.map((item) => {
-            const { donor: { user: { ContactInformation } }, ...rest } = item;
-
-            if (rest.requestStatus === 'APPROVED') {
-                const data = {
-                    ...rest,
-                    contactInformation: ContactInformation
-                }
-                finalResult.push(data)
-            }
-
-            else {
-                const data = {
-                    ...rest
-                }
-                finalResult.push(data)
-            }
-
-        })
-
-    }
+    const finalResult = result.map(item => {
+        const { [includeRelation]: { user: { ContactInformation } }, ...rest } = item;
+        return rest.requestStatus === 'APPROVED'
+            ? { ...rest, contactInformation: ContactInformation }
+            : { ...rest };
+    });
 
     return finalResult
+};
 
-
-}
 
 const updateDonationRequestion = async (id: string, payload: { status: requestStatus }, decoded: TdecodedData) => {
 
