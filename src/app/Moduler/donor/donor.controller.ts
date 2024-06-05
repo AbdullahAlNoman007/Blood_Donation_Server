@@ -45,7 +45,7 @@ const changeStatus = catchAsync(async (req, res) => {
 
 const updateDonor = catchAsync(async (req, res) => {
     const { id } = req.params
-    const result = await donorService.updateDonor(id, req.body)
+    const result = await donorService.updateDonor(id, req.body, req.user)
     sendRespone(res, {
         success: true,
         statusCode: httpStatus.OK,

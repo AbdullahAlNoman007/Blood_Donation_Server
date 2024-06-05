@@ -27,6 +27,8 @@ exports.requesterService = void 0;
 const prismaClient_1 = __importDefault(require("../../utility/prismaClient"));
 const pagination_1 = __importDefault(require("../../utility/pagination"));
 const requester_const_1 = require("./requester.const");
+const AppError_1 = __importDefault(require("../../Error/AppError"));
+const http_status_1 = __importDefault(require("http-status"));
 const getRequester = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip, sortBy, sortOrder } = (0, pagination_1.default)(options);
     const { searchTerm } = params, rest = __rest(params, ["searchTerm"]);
@@ -116,8 +118,11 @@ const changeStatus = (id, payload) => __awaiter(void 0, void 0, void 0, function
     }));
     return result;
 });
-const updateRequester = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const updateRequester = (id, payload, decoded) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, phone, socialMedia } = payload, rest = __rest(payload, ["email", "phone", "socialMedia"]);
+    if (decoded.role === 'Requester' && decoded.userId !== id) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "As a Requester, you can't update other Requester's Info");
+    }
     yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         if (email) {
             yield tx.user.update({

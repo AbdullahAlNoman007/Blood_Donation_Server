@@ -1,9 +1,11 @@
 import { Prisma, accountStatus } from "@prisma/client"
-import { Tpagination } from "../../interface"
+import { TdecodedData, Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
 import calculatePagination from "../../utility/pagination"
 import { requesterSearchFields } from "./requester.const"
 import { IcontactInformation, TgetRequester, requesterUpdatePayload } from "./requester.interface"
+import AppError from "../../Error/AppError"
+import httpStatus from "http-status"
 
 
 
@@ -119,9 +121,11 @@ const changeStatus = async (id: string, payload: { status: accountStatus }) => {
     return result
 }
 
-const updateRequester = async (id: string, payload: requesterUpdatePayload) => {
+const updateRequester = async (id: string, payload: requesterUpdatePayload, decoded: TdecodedData) => {
     const { email, phone, socialMedia, ...rest } = payload;
-
+    if (decoded.role === 'Requester' && decoded.userId !== id) {
+        throw new AppError(httpStatus.BAD_REQUEST, "As a Requester, you can't update other Requester's Info")
+    }
     await prisma.$transaction(async (tx) => {
 
         if (email) {

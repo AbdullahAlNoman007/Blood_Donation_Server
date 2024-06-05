@@ -27,6 +27,8 @@ exports.donorService = void 0;
 const prismaClient_1 = __importDefault(require("../../utility/prismaClient"));
 const donor_const_1 = require("./donor.const");
 const pagination_1 = __importDefault(require("../../utility/pagination"));
+const AppError_1 = __importDefault(require("../../Error/AppError"));
+const http_status_1 = __importDefault(require("http-status"));
 const getDonor = (params, options, decoded) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip, sortBy, sortOrder } = (0, pagination_1.default)(options);
     const { searchTerm, availability } = params, rest = __rest(params, ["searchTerm", "availability"]);
@@ -132,8 +134,11 @@ const changeStatus = (id, payload) => __awaiter(void 0, void 0, void 0, function
     }));
     return result;
 });
-const updateDonor = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const updateDonor = (id, payload, decoded) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, phone, socialMedia } = payload, rest = __rest(payload, ["email", "phone", "socialMedia"]);
+    if (decoded.role === 'Donor' && decoded.userId !== id) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "As a Donor, you can't update other donor's Info");
+    }
     yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         if (email) {
             yield tx.user.update({

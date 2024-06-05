@@ -8,8 +8,8 @@ import { userRole } from '@prisma/client';
 const router = express.Router()
 
 router.get('/donor-list', auth(userRole.Admin, userRole.Requester), donorController.getDonor)
-router.delete('/:id', donorController.deleteDonor)
-router.put('/chage-status/:id', validateRequest(changeStatusValidationSchema), donorController.changeStatus)
-router.put('/update-donor/:id', validateRequest(donorZodSchema.donorValidationSchema), donorController.updateDonor)
+router.delete('/:id', auth(userRole.Admin), donorController.deleteDonor)
+router.put('/chage-status/:id', auth(userRole.Admin), validateRequest(changeStatusValidationSchema), donorController.changeStatus)
+router.put('/update-donor/:id', auth(userRole.Admin, userRole.Donor), validateRequest(donorZodSchema.donorValidationSchema), donorController.updateDonor)
 
 export const donorRouter = router

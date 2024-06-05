@@ -9,6 +9,6 @@ const router = express.Router()
 
 router.post('/donation-request', auth(userRole.Requester), validateRequest(donationZodSchema.donationSchema), donationController.createDonationRequest)
 router.get('/donation-request', auth(userRole.Admin, userRole.Donor, userRole.Requester), donationController.getDonationRequest)
-router.put('/donation-request/:requestId', donationController.updateDonationRequest)
+router.put('/donation-request/:requestId', auth(userRole.Donor), donationController.updateDonationRequest)
 
 export const donationRouter = router;

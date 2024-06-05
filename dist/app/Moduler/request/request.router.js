@@ -13,5 +13,5 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 router.post('/donation-request', (0, auth_1.default)(client_1.userRole.Requester), (0, validationRequest_1.default)(request_validation_1.donationZodSchema.donationSchema), request_controller_1.donationController.createDonationRequest);
 router.get('/donation-request', (0, auth_1.default)(client_1.userRole.Admin, client_1.userRole.Donor, client_1.userRole.Requester), request_controller_1.donationController.getDonationRequest);
-router.put('/donation-request/:requestId', request_controller_1.donationController.updateDonationRequest);
+router.put('/donation-request/:requestId', (0, auth_1.default)(client_1.userRole.Donor), request_controller_1.donationController.updateDonationRequest);
 exports.donationRouter = router;

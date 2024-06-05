@@ -3,11 +3,13 @@ import { userController } from './user.controller'
 import auth from '../../middleWare/auth'
 import validateRequest from '../../middleWare/validationRequest'
 import { validationSchema } from './user.validation'
+import { userRole } from '@prisma/client'
 
 const router = express.Router()
 
 router.post(
     '/create-admin',
+    auth(userRole.Admin),
     validateRequest(validationSchema.adminValidationSchema),
     userController.createAdmin
 )

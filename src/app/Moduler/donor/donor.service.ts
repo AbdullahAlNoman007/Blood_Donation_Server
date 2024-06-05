@@ -141,9 +141,11 @@ const changeStatus = async (id: string, payload: { status: accountStatus }) => {
     return result
 }
 
-const updateDonor = async (id: string, payload: donorUpdatePayload) => {
+const updateDonor = async (id: string, payload: donorUpdatePayload, decoded: TdecodedData) => {
     const { email, phone, socialMedia, ...rest } = payload;
-
+    if (decoded.role === 'Donor' && decoded.userId !== id) {
+        throw new AppError(httpStatus.BAD_REQUEST, "As a Donor, you can't update other donor's Info")
+    }
     await prisma.$transaction(async (tx) => {
 
         if (email) {

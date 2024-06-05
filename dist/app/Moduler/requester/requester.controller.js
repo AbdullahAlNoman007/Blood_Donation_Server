@@ -53,7 +53,7 @@ const changeStatus = (0, trycatch_1.default)((req, res) => __awaiter(void 0, voi
 }));
 const updateRequester = (0, trycatch_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield requester_service_1.requesterService.updateRequester(id, req.body);
+    const result = yield requester_service_1.requesterService.updateRequester(id, req.body, req.user);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
