@@ -44,13 +44,91 @@ const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRe
 }
 
 const getDonationRequestion = async (decoded: TdecodedData) => {
-    const result = await prisma.request.findMany({
-        where: {
-            donorId: decoded.userId
-        }
-    })
+    let result;
+    let finalResult: any[] = [];
+    if (decoded.role === 'Donor') {
 
-    return result
+        result = await prisma.request.findMany({
+            where: {
+                donorId: decoded.userId
+            },
+            include: {
+                requester: {
+                    include: {
+                        user: {
+                            include: {
+                                ContactInformation: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        result.map((item) => {
+            const { requester: { user: { ContactInformation } }, ...rest } = item;
+
+            if (rest.requestStatus === 'APPROVED') {
+                const data = {
+                    ...rest,
+                    contactInformation: ContactInformation
+                }
+                finalResult.push(data)
+            }
+
+            else {
+                const data = {
+                    ...rest
+                }
+                finalResult.push(data)
+            }
+
+        })
+
+
+    }
+    if (decoded.role === 'Requester') {
+        result = await prisma.request.findMany({
+            where: {
+                requesterId: decoded.userId
+            },
+            include: {
+                donor: {
+                    include: {
+                        user: {
+                            include: {
+                                ContactInformation: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        result.map((item) => {
+            const { donor: { user: { ContactInformation } }, ...rest } = item;
+
+            if (rest.requestStatus === 'APPROVED') {
+                const data = {
+                    ...rest,
+                    contactInformation: ContactInformation
+                }
+                finalResult.push(data)
+            }
+
+            else {
+                const data = {
+                    ...rest
+                }
+                finalResult.push(data)
+            }
+
+        })
+
+    }
+
+    return finalResult
+
 
 }
 
