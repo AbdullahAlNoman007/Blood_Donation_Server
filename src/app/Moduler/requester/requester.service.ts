@@ -3,13 +3,8 @@ import { Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
 import calculatePagination from "../../utility/pagination"
 import { requesterSearchFields } from "./requester.const"
-import { TgetRequester, requesterUpdatePayload } from "./requester.interface"
+import { IcontactInformation, TgetRequester, requesterUpdatePayload } from "./requester.interface"
 
-type IcontactInformation = {
-    email?: string;
-    phone?: string;
-    socialMedia?: string;
-}
 
 
 const getRequester = async (params: TgetRequester, options: Tpagination) => {

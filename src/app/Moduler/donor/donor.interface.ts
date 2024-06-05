@@ -6,15 +6,6 @@ export interface TgetDonor {
     availability?: string;
 }
 
-export interface TdonationRequest {
-    donorId: string;
-    phoneNumber: string;
-    dateOfDonation: string;
-    hospitalName: string;
-    hospitalAddress: string;
-    reason: string;
-}
-
 export interface donorUpdatePayload {
     name?: string;
     email?: string;
@@ -22,6 +13,11 @@ export interface donorUpdatePayload {
     age?: number;
     lastDonationDate?: string;
     availability?: boolean;
+    phone?: string;
+    socialMedia?: string;
+}
+export type IcontactInformation = {
+    email?: string;
     phone?: string;
     socialMedia?: string;
 }

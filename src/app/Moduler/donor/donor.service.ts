@@ -1,17 +1,13 @@
 import { Prisma, accountStatus, requestStatus } from "@prisma/client"
 import { TdecodedData, Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
-import { TdonationRequest, TgetDonor, donorUpdatePayload } from "./donor.interface"
+import { IcontactInformation, TgetDonor, donorUpdatePayload } from "./donor.interface"
 import { donorSearchFields } from "./donor.const"
 import calculatePagination from "../../utility/pagination"
 import AppError from "../../Error/AppError"
 import httpStatus from "http-status"
 
-type IcontactInformation = {
-    email?: string;
-    phone?: string;
-    socialMedia?: string;
-}
+
 
 const getDonor = async (params: TgetDonor, options: Tpagination) => {
 

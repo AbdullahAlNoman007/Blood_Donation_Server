@@ -5,15 +5,6 @@ export interface TgetRequester {
     bloodType?: BloodType;
 }
 
-export interface TdonationRequest {
-    donorId: string;
-    phoneNumber: string;
-    dateOfDonation: string;
-    hospitalName: string;
-    hospitalAddress: string;
-    reason: string;
-}
-
 export interface requesterUpdatePayload {
     name?: string;
     email?: string;
@@ -23,3 +14,10 @@ export interface requesterUpdatePayload {
     phone?: string;
     socialMedia?: string;
 }
+
+export type IcontactInformation = {
+    email?: string;
+    phone?: string;
+    socialMedia?: string;
+}
+
