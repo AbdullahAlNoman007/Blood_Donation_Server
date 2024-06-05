@@ -25,22 +25,74 @@ const loginInDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
             email: payload.email
         }
     });
+    let userDetails;
+    if (isUserExists.role === 'Admin') {
+        userDetails = yield prismaClient_1.default.admin.findUniqueOrThrow({
+            where: {
+                userId: isUserExists.id
+            }
+        });
+    }
+    if (isUserExists.role === 'Donor') {
+        userDetails = yield prismaClient_1.default.donor.findUniqueOrThrow({
+            where: {
+                userId: isUserExists.id
+            }
+        });
+    }
+    if (isUserExists.role === 'Requester') {
+        userDetails = yield prismaClient_1.default.requester.findUniqueOrThrow({
+            where: {
+                userId: isUserExists.id
+            }
+        });
+    }
     const isPasswordMatched = bcrypt_1.default.compareSync(payload.password, isUserExists.password);
     if (!isPasswordMatched) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Password doesn't match");
     }
     const jwtPayload = {
         userId: isUserExists.id,
-        email: isUserExists.email
+        email: isUserExists.email,
+        role: isUserExists.role
     };
     const accessToken = (0, Token_1.default)(jwtPayload, config_1.default.jwt.jwt_access_token, config_1.default.jwt.jwt_access_expires_in);
     return {
         id: isUserExists.id,
-        name: isUserExists.name,
+        name: userDetails === null || userDetails === void 0 ? void 0 : userDetails.name,
         email: isUserExists.email,
         token: accessToken
     };
 });
+const changePassword = (payload, decode) => __awaiter(void 0, void 0, void 0, function* () {
+    if (payload.newPassword !== payload.confirmPassword) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "New password and Confirm Password don't match!!!");
+    }
+    const isUserExists = yield prismaClient_1.default.user.findUniqueOrThrow({
+        where: {
+            id: decode.userId,
+            email: decode.email,
+            status: 'ACTIVE'
+        }
+    });
+    const isPasswordMatched = yield bcrypt_1.default.compare(payload.oldPassword, isUserExists.password);
+    if (!isPasswordMatched) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Password doesn't match");
+    }
+    const hashPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.hash_salt_round));
+    const result = yield prismaClient_1.default.user.update({
+        where: {
+            id: decode.userId,
+            email: decode.email,
+            status: 'ACTIVE'
+        },
+        data: {
+            password: hashPassword
+        }
+    });
+    return result;
+});
 exports.authService = {
-    loginInDB
+    loginInDB,
+    changePassword
 };

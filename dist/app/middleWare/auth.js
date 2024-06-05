@@ -17,25 +17,26 @@ const AppError_1 = __importDefault(require("../Error/AppError"));
 const trycatch_1 = __importDefault(require("../utility/trycatch"));
 const jwt_decode_1 = require("jwt-decode");
 const prismaClient_1 = __importDefault(require("../utility/prismaClient"));
-const auth = () => {
+const auth = (...roles) => {
     return (0, trycatch_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        let decoded;
         const token = req.headers.authorization;
         if (!token) {
             throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Please Put the Access Token");
         }
-        try {
-            decoded = (0, jwt_decode_1.jwtDecode)(token);
-        }
-        catch (error) {
-            console.log(error);
-            next(error);
-        }
+        const decoded = (0, jwt_decode_1.jwtDecode)(token);
         yield prismaClient_1.default.user.findUniqueOrThrow({
             where: {
-                email: decoded.email
+                email: decoded.email,
+                id: decoded.userId,
+                status: 'ACTIVE'
             }
         });
+        if (roles.length <= 0) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized");
+        }
+        if (!roles.includes(decoded.role)) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized");
+        }
         req.user = decoded;
         next();
     }));

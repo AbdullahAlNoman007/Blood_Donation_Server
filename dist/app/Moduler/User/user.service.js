@@ -16,82 +16,112 @@ exports.userService = void 0;
 const config_1 = __importDefault(require("../../config"));
 const prismaClient_1 = __importDefault(require("../../utility/prismaClient"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+const client_1 = require("@prisma/client");
+const createAdminIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const hashPassword = yield bcrypt_1.default.hash(payload.password, Number(config_1.default.hash_salt_round));
     const user = {
-        name: payload.name,
         email: payload.email,
         password: hashPassword,
-        bloodType: payload.bloodType,
-        location: payload.location
+        role: client_1.userRole.Admin
     };
     const result = yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const createUser = yield tx.user.create({
             data: user,
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                bloodType: true,
-                location: true,
-                availability: true,
-                createdAt: true,
-                updatedAt: true
-            }
         });
-        const userProfile = {
+        const adminData = {
             userId: createUser.id,
-            bio: payload.bio,
-            age: payload.age,
-            lastDonationDate: payload.lastDonationDate
+            name: payload.name,
+            email: payload.email
         };
-        const createUserProfile = yield tx.userProfile.create({
-            data: userProfile
+        const createAdmin = yield tx.admin.create({
+            data: adminData
         });
-        return Object.assign(Object.assign({}, createUser), { userProfile: createUserProfile });
+        const contactInfo = {
+            userId: createUser.id,
+            email: payload.email,
+            phone: payload.phone,
+            socialMedia: payload.socialMedia || config_1.default.const.social,
+        };
+        yield tx.contactInformation.create({
+            data: contactInfo
+        });
+        return createAdmin;
     }));
     return result;
 });
-const getProfile = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prismaClient_1.default.user.findUniqueOrThrow({
-        where: {
-            email: payload.email
-        },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            bloodType: true,
-            location: true,
-            availability: true,
-            createdAt: true,
-            updatedAt: true,
-            userProfile: true,
-        }
-    });
+const createDonorIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const hashPassword = yield bcrypt_1.default.hash(payload.password, Number(config_1.default.hash_salt_round));
+    const user = {
+        email: payload.email,
+        password: hashPassword,
+        role: client_1.userRole.Donor
+    };
+    const result = yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const createUser = yield tx.user.create({
+            data: user,
+        });
+        const donorData = {
+            userId: createUser.id,
+            name: payload.name,
+            age: payload.age,
+            email: payload.email,
+            bloodType: payload.bloodType,
+            location: payload.location,
+            availability: payload.availability,
+            lastDonationDate: payload.lastDonationDate
+        };
+        const createDonor = yield tx.donor.create({
+            data: donorData
+        });
+        const contactInfo = {
+            userId: createUser.id,
+            email: payload.email,
+            phone: payload.phone,
+            socialMedia: payload.socialMedia || config_1.default.const.social,
+        };
+        yield tx.contactInformation.create({
+            data: contactInfo
+        });
+        return createDonor;
+    }));
     return result;
 });
-const updateProfile = (decode, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prismaClient_1.default.user.findUniqueOrThrow({
-        where: {
-            email: decode.email
-        }
-    });
-    yield prismaClient_1.default.userProfile.findUniqueOrThrow({
-        where: {
-            userId: decode.userId
-        }
-    });
-    const updateUserProfile = yield prismaClient_1.default.userProfile.update({
-        where: {
-            userId: decode.userId
-        },
-        data: payload
-    });
-    return updateUserProfile;
+const createRequesterIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const hashPassword = yield bcrypt_1.default.hash(payload.password, Number(config_1.default.hash_salt_round));
+    const user = {
+        email: payload.email,
+        password: hashPassword,
+        role: client_1.userRole.Requester
+    };
+    const result = yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const createUser = yield tx.user.create({
+            data: user,
+        });
+        const requesterData = {
+            userId: createUser.id,
+            name: payload.name,
+            email: payload.email,
+            bloodType: payload.bloodType,
+            location: payload.location,
+        };
+        const createRequester = yield tx.requester.create({
+            data: requesterData
+        });
+        const contactInfo = {
+            userId: createUser.id,
+            email: payload.email,
+            phone: payload.phone,
+            socialMedia: payload.socialMedia || config_1.default.const.social,
+        };
+        yield tx.contactInformation.create({
+            data: contactInfo
+        });
+        return createRequester;
+    }));
+    return result;
 });
 exports.userService = {
-    createUserIntoDB,
-    getProfile,
-    updateProfile
+    createAdminIntoDB,
+    createDonorIntoDB,
+    createRequesterIntoDB
 };

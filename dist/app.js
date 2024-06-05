@@ -17,7 +17,7 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/api', router_1.default);
 app.get('/', (req, res) => {
     res.send({
-        Message: `Assigment 8 ...`
+        Message: `Blood Donation ...`
     });
 });
 app.use(globalErrorHandle_1.default);

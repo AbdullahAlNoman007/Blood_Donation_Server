@@ -23,17 +23,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.donorService = void 0;
+exports.requesterService = void 0;
 const prismaClient_1 = __importDefault(require("../../utility/prismaClient"));
-const donor_const_1 = require("./donor.const");
 const pagination_1 = __importDefault(require("../../utility/pagination"));
-const getDonor = (params, options, decoded) => __awaiter(void 0, void 0, void 0, function* () {
+const requester_const_1 = require("./requester.const");
+const getRequester = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip, sortBy, sortOrder } = (0, pagination_1.default)(options);
-    const { searchTerm, availability } = params, rest = __rest(params, ["searchTerm", "availability"]);
+    const { searchTerm } = params, rest = __rest(params, ["searchTerm"]);
     let andCondition = [];
     if (searchTerm) {
         andCondition.push({
-            OR: donor_const_1.donorSearchFields.map((item) => ({
+            OR: requester_const_1.requesterSearchFields.map((item) => ({
                 [item]: {
                     contains: searchTerm,
                     mode: 'insensitive'
@@ -50,25 +50,9 @@ const getDonor = (params, options, decoded) => __awaiter(void 0, void 0, void 0,
             }))
         });
     }
-    if (availability) {
-        andCondition.push({
-            availability: {
-                equals: availability.toLowerCase() === 'true' ? true : false
-            }
-        });
-    }
-    if ((decoded === null || decoded === void 0 ? void 0 : decoded.role) === 'Requester') {
-        const requester = yield prismaClient_1.default.requester.findUniqueOrThrow({
-            where: {
-                userId: decoded.userId
-            }
-        });
-        andCondition.push({
-            bloodType: requester.bloodType
-        });
-    }
     const whereCondition = { AND: andCondition };
-    const data = yield prismaClient_1.default.donor.findMany({
+    console.dir(whereCondition, { depth: 'infinity' });
+    const data = yield prismaClient_1.default.requester.findMany({
         where: whereCondition,
         skip,
         take: limit,
@@ -76,7 +60,7 @@ const getDonor = (params, options, decoded) => __awaiter(void 0, void 0, void 0,
             [sortBy]: sortOrder
         }
     });
-    const total = yield prismaClient_1.default.donor.count({ where: whereCondition });
+    const total = yield prismaClient_1.default.requester.count({ where: whereCondition });
     const meta = {
         total,
         page,
@@ -84,11 +68,11 @@ const getDonor = (params, options, decoded) => __awaiter(void 0, void 0, void 0,
     };
     return { meta, data };
 });
-const deleteDonor = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteRequester = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         yield tx.request.deleteMany({
             where: {
-                donorId: id
+                requesterId: id
             }
         });
         yield tx.contactInformation.delete({
@@ -96,7 +80,7 @@ const deleteDonor = (id) => __awaiter(void 0, void 0, void 0, function* () {
                 userId: id
             }
         });
-        const donor = yield tx.donor.delete({
+        const requester = yield tx.requester.delete({
             where: {
                 userId: id
             }
@@ -106,7 +90,7 @@ const deleteDonor = (id) => __awaiter(void 0, void 0, void 0, function* () {
                 id: id
             }
         });
-        return donor;
+        return requester;
     }));
     return result;
 });
@@ -120,7 +104,7 @@ const changeStatus = (id, payload) => __awaiter(void 0, void 0, void 0, function
                 status: payload.status
             }
         });
-        const donor = yield tx.requester.update({
+        const donor = yield tx.donor.update({
             where: {
                 id: id
             },
@@ -132,7 +116,7 @@ const changeStatus = (id, payload) => __awaiter(void 0, void 0, void 0, function
     }));
     return result;
 });
-const updateDonor = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const updateRequester = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, phone, socialMedia } = payload, rest = __rest(payload, ["email", "phone", "socialMedia"]);
     yield prismaClient_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         if (email) {
@@ -140,7 +124,7 @@ const updateDonor = (id, payload) => __awaiter(void 0, void 0, void 0, function*
                 where: { id },
                 data: { email }
             });
-            yield tx.donor.update({
+            yield tx.requester.update({
                 where: { id },
                 data: { email }
             });
@@ -159,17 +143,17 @@ const updateDonor = (id, payload) => __awaiter(void 0, void 0, void 0, function*
             });
         }
         if (Object.keys(rest).length > 0) {
-            yield tx.donor.update({
+            yield tx.requester.update({
                 where: { id },
                 data: rest
             });
         }
     }));
-    return { message: "Donor's Data is Updated!!!" };
+    return { message: "Requester's Data is Updated!!!" };
 });
-exports.donorService = {
-    getDonor,
-    deleteDonor,
+exports.requesterService = {
+    getRequester,
+    deleteRequester,
     changeStatus,
-    updateDonor
+    updateRequester
 };

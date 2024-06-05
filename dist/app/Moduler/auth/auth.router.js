@@ -10,4 +10,5 @@ const auth_validation_1 = require("./auth.validation");
 const auth_controller_1 = require("./auth.controller");
 const router = express_1.default.Router();
 router.post('/login', (0, validationRequest_1.default)(auth_validation_1.loginValidation), auth_controller_1.authController.login);
+router.post('/change-password', (0, validationRequest_1.default)(auth_validation_1.changePasswordValidation), auth_controller_1.authController.login);
 exports.authRouter = router;
