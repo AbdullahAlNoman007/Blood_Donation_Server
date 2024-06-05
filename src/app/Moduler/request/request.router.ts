@@ -3,10 +3,11 @@ import auth from '../../middleWare/auth'
 import validateRequest from '../../middleWare/validationRequest'
 import { donationZodSchema } from './request.validation'
 import { donationController } from './request.controller'
+import { userRole } from '@prisma/client'
 
 const router = express.Router()
 
-router.post('/donation-request', validateRequest(donationZodSchema.donationSchema), donationController.createDonationRequest)
+router.post('/donation-request', auth(userRole.Requester), validateRequest(donationZodSchema.donationSchema), donationController.createDonationRequest)
 router.get('/donation-request', donationController.getDonationRequest)
 router.put('/donation-request/:requestId', donationController.updateDonationRequest)
 

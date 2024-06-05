@@ -51,7 +51,7 @@ const createDonorIntoDB = async (payload: donorPayload) => {
     const user = {
         email: payload.email,
         password: hashPassword,
-        role: userRole.Admin
+        role: userRole.Donor
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -97,7 +97,7 @@ const createRequesterIntoDB = async (payload: requesterPayload) => {
     const user = {
         email: payload.email,
         password: hashPassword,
-        role: userRole.Admin
+        role: userRole.Requester
     }
 
     const result = await prisma.$transaction(async (tx) => {

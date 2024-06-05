@@ -7,21 +7,42 @@ import { requestStatus } from "@prisma/client"
 
 const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRequest) => {
 
-    await prisma.user.findUniqueOrThrow({
+    const donor = await prisma.donor.findUniqueOrThrow({
         where: {
-            id: payload.donorId
+            userId: payload.donorId
+        }
+    })
+
+    const requester = await prisma.requester.findUniqueOrThrow({
+        where: {
+            userId: decoded.userId
+        }
+    })
+
+    const contactInfo = await prisma.contactInformation.findUniqueOrThrow({
+        where: {
+            userId: decoded.userId
         }
     })
 
     const data = {
         requesterId: decoded.userId,
+        phoneNumber: contactInfo.phone,
         ...payload
     }
-    const result = await prisma.request.create({
-        data: data
-    })
 
-    return result
+    console.log({ donor });
+    console.log({ requester });
+    console.log({ data });
+
+
+
+
+    // const result = await prisma.request.create({
+    //     data: data
+    // })
+
+    // return result
 
 }
 

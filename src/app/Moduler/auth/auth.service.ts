@@ -13,6 +13,8 @@ const loginInDB = async (payload: Tlogin) => {
             email: payload.email
         }
     })
+    console.log(isUserExists);
+
     let userDetails;
 
     if (isUserExists.role === 'Admin') {
@@ -44,7 +46,8 @@ const loginInDB = async (payload: Tlogin) => {
 
     const jwtPayload = {
         userId: isUserExists.id,
-        email: isUserExists.email
+        email: isUserExists.email,
+        role: isUserExists.role
     }
 
     const accessToken = token(jwtPayload, config.jwt.jwt_access_token as string, config.jwt.jwt_access_expires_in as string)
