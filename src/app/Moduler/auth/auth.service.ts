@@ -39,6 +39,7 @@ const loginInDB = async (payload: Tlogin) => {
     }
 
     const isPasswordMatched = bcrypt.compareSync(payload.password, isUserExists.password)
+
     if (!isPasswordMatched) {
         throw new AppError(httpStatus.BAD_REQUEST, "Password doesn't match")
     }
@@ -65,8 +66,6 @@ const changePassword = async (payload: IchangePassword, decode: TdecodedData) =>
     if (payload.newPassword !== payload.confirmPassword) {
         throw new AppError(httpStatus.BAD_REQUEST, "New password and Confirm Password don't match!!!")
     }
-    console.log(decode);
-    console.log(payload);
 
     const isUserExists = await prisma.user.findUniqueOrThrow({
         where: {
@@ -76,7 +75,9 @@ const changePassword = async (payload: IchangePassword, decode: TdecodedData) =>
         }
     })
 
-    const isPasswordMatched = await bcrypt.compare(payload.oldPassword, isUserExists.password);
+    const isPasswordMatched = bcrypt.compareSync(payload.oldPassword, isUserExists.password);
+
+
     if (!isPasswordMatched) {
         throw new AppError(httpStatus.BAD_REQUEST, "Password doesn't match");
     }
