@@ -65,6 +65,8 @@ const changePassword = async (payload: IchangePassword, decode: TdecodedData) =>
     if (payload.newPassword !== payload.confirmPassword) {
         throw new AppError(httpStatus.BAD_REQUEST, "New password and Confirm Password don't match!!!")
     }
+    console.log(decode);
+    console.log(payload);
 
     const isUserExists = await prisma.user.findUniqueOrThrow({
         where: {
