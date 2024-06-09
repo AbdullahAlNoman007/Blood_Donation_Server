@@ -6,8 +6,6 @@ import { TdonationRequest } from "./request.interface"
 import { requestStatus } from "@prisma/client"
 
 const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRequest) => {
-    console.log({ decoded });
-    console.log({ payload });
 
     const donor = await prisma.donor.findUniqueOrThrow({
         where: {
