@@ -6,12 +6,15 @@ import { TdonationRequest } from "./request.interface"
 import { requestStatus } from "@prisma/client"
 
 const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRequest) => {
+    console.log({ decoded });
+    console.log({ payload });
 
     const donor = await prisma.donor.findUniqueOrThrow({
         where: {
-            userId: payload.donorId
+            id: payload.donorId
         }
     })
+
 
     const requester = await prisma.requester.findUniqueOrThrow({
         where: {
@@ -29,10 +32,13 @@ const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRe
         }
     })
 
+
+
     const data = {
         requesterId: decoded.userId,
         phoneNumber: contactInfo.phone,
-        ...payload
+        ...payload,
+        donorId: donor.userId
     }
 
     const result = await prisma.request.create({
