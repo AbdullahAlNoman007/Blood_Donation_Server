@@ -38,11 +38,23 @@ const createRequester = catchAsync(async (req, res) => {
         data: result
     })
 })
+const getMe = catchAsync(async (req, res) => {
+
+    const result = await userService.getMe(req.user)
+
+    sendRespone(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "My Profile is fetched successfully",
+        data: result
+    })
+})
 
 
 
 export const userController = {
     createAdmin,
     createDonor,
-    createRequester
+    createRequester,
+    getMe
 }

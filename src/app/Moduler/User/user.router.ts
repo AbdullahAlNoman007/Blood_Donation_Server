@@ -23,6 +23,11 @@ router.post(
     validateRequest(validationSchema.requesterValidationSchema),
     userController.createRequester
 )
+router.get(
+    '/get-me',
+    auth(userRole.Admin, userRole.Donor, userRole.Requester),
+    userController.getMe
+)
 
 
 export const userRouter = router

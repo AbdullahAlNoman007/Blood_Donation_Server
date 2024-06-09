@@ -3,6 +3,7 @@ import prisma from "../../utility/prismaClient"
 import { adminPayload, donorPayload, requesterPayload } from "./user.interface"
 import bcrypt from 'bcrypt'
 import { userRole } from "@prisma/client"
+import { TdecodedData } from "../../interface"
 
 const createAdminIntoDB = async (payload: adminPayload) => {
 
@@ -133,9 +134,39 @@ const createRequesterIntoDB = async (payload: requesterPayload) => {
     return result
 }
 
+const getMe = async (payload: TdecodedData) => {
+    const { role, userId, email } = payload;
+
+    const query: any = {
+        where: {
+            userId,
+            email,
+            status: 'ACTIVE'
+        }
+    };
+
+    let result;
+    switch (role) {
+        case 'Admin':
+            result = await prisma.admin.findUniqueOrThrow(query);
+            break;
+        case 'Donor':
+            result = await prisma.donor.findUniqueOrThrow(query);
+            break;
+        case 'Requester':
+            result = await prisma.requester.findUniqueOrThrow(query);
+            break;
+        default:
+            throw new Error('Invalid role');
+    }
+
+    return result;
+};
+
 
 export const userService = {
     createAdminIntoDB,
     createDonorIntoDB,
-    createRequesterIntoDB
+    createRequesterIntoDB,
+    getMe
 }
