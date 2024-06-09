@@ -20,6 +20,17 @@ const getDonor = catchAsync(async (req, res) => {
         data: result.data
     })
 })
+const getByDonor = catchAsync(async (req, res) => {
+    const { id } = req.params
+    const result = await donorService.getByDonor(id);
+
+    sendRespone(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Donor is successfully found",
+        data: result
+    })
+})
 
 const deleteDonor = catchAsync(async (req, res) => {
     const { id } = req.params
@@ -58,5 +69,7 @@ export const donorController = {
     getDonor,
     deleteDonor,
     changeStatus,
-    updateDonor
+    updateDonor,
+    getByDonor
+
 }

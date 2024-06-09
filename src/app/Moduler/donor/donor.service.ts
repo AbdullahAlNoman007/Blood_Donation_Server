@@ -184,9 +184,20 @@ const updateDonor = async (id: string, payload: donorUpdatePayload, decoded: Tde
     return { message: "Donor's Data is Updated!!!" };
 };
 
+const getByDonor = async (id: string) => {
+    const result = await prisma.donor.findUniqueOrThrow({
+        where: {
+            id: id
+        }
+    })
+
+    return result
+}
+
 export const donorService = {
     getDonor,
     deleteDonor,
     changeStatus,
-    updateDonor
+    updateDonor,
+    getByDonor
 }
