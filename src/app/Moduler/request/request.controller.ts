@@ -2,6 +2,8 @@ import httpStatus from "http-status"
 import sendRespone from "../../utility/sendResponse"
 import catchAsync from "../../utility/trycatch"
 import { donationService } from "./request.service"
+import pick from "../../utility/pick"
+import { donationFilterFields, donationPaginationFields } from "./request.const"
 
 const createDonationRequest = catchAsync(async (req, res) => {
 
@@ -17,7 +19,10 @@ const createDonationRequest = catchAsync(async (req, res) => {
 
 const getDonationRequest = catchAsync(async (req, res) => {
 
-    const result = await donationService.getDonationRequestion(req.user)
+    const filter = pick(req.query, donationFilterFields);
+    const options = pick(req.query, donationPaginationFields);
+
+    const result = await donationService.getDonationRequestion(filter, options, req.user)
 
     sendRespone(res, {
         success: true,

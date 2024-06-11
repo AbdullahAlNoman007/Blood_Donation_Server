@@ -1,9 +1,11 @@
 import httpStatus from "http-status"
 import AppError from "../../Error/AppError"
-import { TdecodedData } from "../../interface"
+import { TdecodedData, Tpagination } from "../../interface"
 import prisma from "../../utility/prismaClient"
 import { TdonationRequest } from "./request.interface"
-import { requestStatus } from "@prisma/client"
+import { Prisma, requestStatus } from "@prisma/client"
+import calculatePagination from "../../utility/pagination"
+import { donationSearchField } from "./request.const"
 
 const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRequest) => {
 
@@ -47,35 +49,85 @@ const createDonationRequest = async (decoded: TdecodedData, payload: TdonationRe
 
 }
 
-const getDonationRequestion = async (decoded: TdecodedData) => {
-    const roleKey = decoded.role === 'Donor' ? 'donorId' : 'requesterId';
-    const includeRelation = decoded.role === 'Donor' ? 'requester' : 'donor';
+const getDonationRequestion = async (params: { searchTerm?: string, requestStatus?: requestStatus }, options: Tpagination, decoded: TdecodedData) => {
 
-    const result = await prisma.request.findMany({
-        where: {
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options)
+    const { searchTerm, requestStatus } = params
+    let andCondition: Prisma.RequestWhereInput[] = []
+
+
+    if (searchTerm) {
+        andCondition.push({
+            OR: donationSearchField.map((item) => ({
+                [item]: {
+                    contains: searchTerm,
+                    mode: 'insensitive'
+                }
+            }))
+        })
+    }
+
+    if (requestStatus) {
+        andCondition.push({
+            requestStatus: {
+                equals: requestStatus
+            }
+        })
+    }
+
+
+    const whereCondition: Prisma.RequestWhereInput = { AND: andCondition }
+
+    if (decoded.role === 'Admin') {
+
+        const result = await prisma.request.findMany({
+            where: whereCondition,
+            skip,
+            take: limit,
+            orderBy: {
+                [sortBy]: sortOrder
+            },
+        });
+
+        return result
+    }
+    else {
+
+        const roleKey = decoded.role === 'Donor' ? 'donorId' : 'requesterId';
+        const includeRelation = decoded.role === 'Donor' ? 'requester' : 'donor';
+
+        andCondition.push({
             [roleKey]: decoded.userId,
-        },
-        include: {
-            [includeRelation]: {
-                include: {
-                    user: {
-                        include: {
-                            ContactInformation: true,
+        })
+        const result = await prisma.request.findMany({
+            where: whereCondition,
+            skip,
+            take: limit,
+            orderBy: {
+                [sortBy]: sortOrder
+            },
+            include: {
+                [includeRelation]: {
+                    include: {
+                        user: {
+                            include: {
+                                ContactInformation: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        });
 
-    const finalResult = result.map(item => {
-        const { [includeRelation]: { user: { ContactInformation } }, ...rest } = item;
-        return rest.requestStatus === 'APPROVED'
-            ? { ...rest, contactInformation: ContactInformation }
-            : { ...rest };
-    });
+        const finalResult = result.map(item => {
+            const { [includeRelation]: { user: { ContactInformation } }, ...rest } = item;
+            return rest.requestStatus === 'APPROVED'
+                ? { ...rest, contactInformation: ContactInformation }
+                : { ...rest };
+        });
 
-    return finalResult
+        return finalResult
+    }
 };
 
 
