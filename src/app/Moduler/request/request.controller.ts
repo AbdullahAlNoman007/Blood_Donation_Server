@@ -22,6 +22,8 @@ const getDonationRequest = catchAsync(async (req, res) => {
     const filter = pick(req.query, donationFilterFields);
     const options = pick(req.query, donationPaginationFields);
 
+    console.log(filter);
+
     const result = await donationService.getDonationRequestion(filter, options, req.user)
 
     sendRespone(res, {
